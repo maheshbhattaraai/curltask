@@ -28,8 +28,42 @@
             curl_setopt($realData, CURLOPT_TIMEOUT, 50);
             curl_setopt($realData, CURLOPT_SSL_VERIFYHOST, false);
             curl_setopt($realData, CURLOPT_SSL_VERIFYPEER, false);
-                $html[] = curl_exec($realData);
+            $paginateData = curl_exec($realData);
             curl_close($realData);
+            $doc = phpQuery::newDocument($paginateData);
+            phpQuery::selectDocument($doc);
+            foreach(pq('.results__item') as $rs){
+                $phone = "";
+                $street="";
+                $city = "";
+                $state = "";
+                $postCode="";
+                $country="";
+               
+                foreach(pq($rs)->find('p') as $k=>$paragraph){
+                    if($k==1){
+                        $address = preg_split('/<br[^>]*>/i', pq($paragraph));
+                        if(array_key_exists(0,$address))
+                            $street = $address[0];
+                        if(array_key_exists(1,$address)){
+                            $cityStatePostCode = explode(",",$address[1]);
+                            if(array_key_exists(0,$cityStatePostCode))
+                                $city = $cityStatePostCode[0];
+                            if(array_key_exists(1,$cityStatePostCode))
+                                $state = $cityStatePostCode[1];
+                            if(array_key_exists(2,$cityStatePostCode))
+                                $postCode = $cityStatePostCode[2];
+                        }
+                        if(array_key_exists(2,$address))
+                            $country = $address[2];
+                    }
+                    if($k==2){
+                        $phone = pq($paragraph)->find('a')->text();
+                    }
+                }
+                $html[] = (object)['contact_name'=>pq($rs)->find('strong.name')->text(),'phone'=>$phone,'street'=>$street,'city'=>$city,'state'=>$state,'postCode'=>$postCode,'country'=>$country];
+            }
+           
         }
         return $html;
     }
