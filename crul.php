@@ -14,7 +14,6 @@
                         $url .= "ids=".$result;
                     else
                         $url .= "&ids=".$result;
-                    break;
                 }
                 $urls[] = $url;
             }
@@ -110,11 +109,9 @@
         if($serviceProvidedBy!=null){
             foreach(pq('#memberSearch_AreaOfPracticeId > option') as $k=>$opt){
                 if($opt->getAttribute('value')!='' && $opt->getAttribute('value')!=null){
-                    if($k==1){
-                        if($serviceProvidedBy){
-                            $allFaceToFaceData[] =(object)['name'=>$opt->textContent,'data'=>getPaginatedData($serviceProvidedBy,$opt->getAttribute('value'))];
-                        }
-                    }
+                    if($serviceProvidedBy){
+                        $allFaceToFaceData[] =(object)['name'=>$opt->textContent,'data'=>getPaginatedData($serviceProvidedBy,$opt->getAttribute('value'))];
+                    }   
                 }
             }
         }
